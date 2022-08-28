@@ -10,3 +10,10 @@ func NewCalculator() *Calculator {
 func (c Calculator) Add(num1, num2 int) int {
 	panic("implement me")
 }
+
+func (c Calculator) Minus(num1, num2 int) int {
+	return num1 - num2
+
+func (c Calculator) Multiply(num1, num2 int) int {
+	return num1 * num2
+}
