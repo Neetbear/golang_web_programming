@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/stretchr/testify/assert"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -80,7 +81,7 @@ func TestGolang(t *testing.T) {
 		add := time.Second * 3
 		ctx, _ := context.WithTimeout(context.Background(), add)
 		var endTime time.Time
-    
+
 		select {
 		case <-ctx.Done():
 			endTime = time.Now()
