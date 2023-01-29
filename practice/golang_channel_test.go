@@ -46,29 +46,33 @@ func TestCh(t *testing.T) {
 	t.Run("range", func(t *testing.T) {
 		// TODO 1단계: ch에서 값을 가져와 출력하기
 		// TODO 2단계: 에러 없애기
-		//ch := make(chan int, 3)
-		//ch <- 1
-		//ch <- 2
-		//ch <- 3
-		//
-		//for range ch {
-		//	fmt.Println(value)
-		//}
+		ch := make(chan int, 3)
+		ch <- 1
+		ch <- 2
+		ch <- 3
+		close(ch)
+
+		for value := range ch {
+			fmt.Println(value)
+		}
 	})
 
 	t.Run("for-select", func(t *testing.T) {
 		// TODO 1단계: ch에서 값을 가져와 출력하기
 		// TODO 2단계: 에러 없애기
-		//ch := make(chan int, 3)
-		//ch <- 1
-		//ch <- 2
-		//ch <- 3
-		//
-		//for {
-		//	select {
-		//	case <-ch:
-		//		fmt.Println(value)
-		//	}
-		//}
+		ch := make(chan int, 3)
+		ch <- 1
+		ch <- 2
+		ch <- 3
+
+		for {
+			select {
+			case value, ok := <-ch:
+				fmt.Println(value)
+				if !ok {
+					return
+				}
+			}
+		}
 	})
 }

@@ -2,18 +2,21 @@ package practice
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// golang 학습 테스트
+// golang 학습 테스트 week1 과제1
 func TestGolang(t *testing.T) {
 	t.Run("string test", func(t *testing.T) {
-		//str := "Ann,Jenny,Tom,Zico"
-		//actual := "" // TODO str을 , 단위로 잘라주세요.
-		//expected := []string{"Ann","Jenny","Tom","Zico"}
+		str := "Ann,Jenny,Tom,Zico"
+		actual := strings.Split(str, ",") // TODO str을 , 단위로 잘라주세요.
+		expected := []string{"Ann", "Jenny", "Tom", "Zico"}
 		//TODO assert 문을 활용해 actual과 expected를 비교해주세요.
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("goroutine에서 slice에 값 추가해보기", func(t *testing.T) {
@@ -21,11 +24,14 @@ func TestGolang(t *testing.T) {
 		for i := 0; i < 100; i++ {
 			go func() {
 				// TODO numbers에 i 값을 추가해보세요.
+				i := i
+				numbers[i] = i
 			}()
 		}
 
 		var expected []int // actual : [0 1 2 ... 99]
 		// TODO expected를 만들어주세요.
+		// expected = [...]int{}
 		assert.ElementsMatch(t, expected, numbers)
 	})
 

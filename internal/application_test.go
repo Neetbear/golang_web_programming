@@ -1,10 +1,12 @@
 package internal
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
+// week1 - 과제3
 func TestCreateMembership(t *testing.T) {
 	t.Run("멤버십을 생성한다.", func(t *testing.T) {
 		app := NewApplication(*NewRepository(map[string]Membership{}))
