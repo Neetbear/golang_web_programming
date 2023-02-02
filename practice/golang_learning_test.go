@@ -3,6 +3,7 @@ package practice
 import (
 	"context"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -21,17 +22,22 @@ func TestGolang(t *testing.T) {
 
 	t.Run("goroutine에서 slice에 값 추가해보기", func(t *testing.T) {
 		var numbers []int
+		var wg sync.WaitGroup
+		wg.Add(100)
 		for i := 0; i < 100; i++ {
-			go func() {
+			go func(i int) {
+				// fmt.Println(i)
 				// TODO numbers에 i 값을 추가해보세요.
-				i := i
-				numbers[i] = i
-			}()
+				numbers = append(numbers, i)
+				wg.Done()
+			}(i)
 		}
-
+		wg.Wait()
 		var expected []int // actual : [0 1 2 ... 99]
 		// TODO expected를 만들어주세요.
-		// expected = [...]int{}
+		for i := 0; i < 100; i++ {
+			expected = append(expected, i)
+		}
 		assert.ElementsMatch(t, expected, numbers)
 	})
 
@@ -46,10 +52,15 @@ func TestGolang(t *testing.T) {
 
 		inputCh := generate()
 		outputCh := make(chan int)
+
 		go func() {
 			for {
 				select {
-				case value := <-inputCh:
+				case value, ok := <-inputCh:
+					if !ok {
+						close(outputCh)
+						return
+					}
 					outputCh <- value * 10
 				}
 			}
@@ -67,6 +78,7 @@ func TestGolang(t *testing.T) {
 		startTime := time.Now()
 		add := time.Second * 3
 		ctx := context.TODO() // TODO 3초후에 종료하는 timeout context로 만들어주세요.
+		ctx, _ = context.WithTimeout(ctx, add)
 
 		var endTime time.Time
 		select {
@@ -82,7 +94,7 @@ func TestGolang(t *testing.T) {
 		startTime := time.Now()
 		add := time.Second * 3
 		ctx := context.TODO() // TODO 3초후에 종료하는 timeout context로 만들어주세요.
-
+		ctx, _ = context.WithDeadline(ctx, time.Now().Add(add))
 		var endTime time.Time
 		select {
 		case <-ctx.Done():
@@ -94,9 +106,13 @@ func TestGolang(t *testing.T) {
 	})
 
 	t.Run("context value", func(t *testing.T) {
+		ctx := context.TODO()
 		// context에 key, value를 추가해보세요.
+		ctx = context.WithValue(ctx, "key", "value")
 		// 추가된 key, value를 호출하여 assert로 값을 검증해보세요.
+		assert.Equal(t, "value", ctx.Value("key"))
 		// 추가되지 않은 key에 대한 value를 assert로 검증해보세요.
+		assert.Nil(t, ctx.Value("key2"))
 	})
 }
 
