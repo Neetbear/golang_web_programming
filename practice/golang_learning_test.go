@@ -2,30 +2,42 @@ package practice
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
+	"strings"
+	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
-// golang 학습 테스트
+// golang 학습 테스트 week1 과제1
 func TestGolang(t *testing.T) {
 	t.Run("string test", func(t *testing.T) {
-		//str := "Ann,Jenny,Tom,Zico"
-		//actual := "" // TODO str을 , 단위로 잘라주세요.
-		//expected := []string{"Ann","Jenny","Tom","Zico"}
+		str := "Ann,Jenny,Tom,Zico"
+		actual := strings.Split(str, ",") // TODO str을 , 단위로 잘라주세요.
+		expected := []string{"Ann", "Jenny", "Tom", "Zico"}
 		//TODO assert 문을 활용해 actual과 expected를 비교해주세요.
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("goroutine에서 slice에 값 추가해보기", func(t *testing.T) {
 		var numbers []int
+		var wg sync.WaitGroup
+		wg.Add(100)
 		for i := 0; i < 100; i++ {
-			go func() {
+			go func(i int) {
+				// fmt.Println(i)
 				// TODO numbers에 i 값을 추가해보세요.
-			}()
+				numbers = append(numbers, i)
+				wg.Done()
+			}(i)
 		}
-
+		wg.Wait()
 		var expected []int // actual : [0 1 2 ... 99]
 		// TODO expected를 만들어주세요.
+		for i := 0; i < 100; i++ {
+			expected = append(expected, i)
+		}
 		assert.ElementsMatch(t, expected, numbers)
 	})
 
@@ -40,10 +52,15 @@ func TestGolang(t *testing.T) {
 
 		inputCh := generate()
 		outputCh := make(chan int)
+
 		go func() {
 			for {
 				select {
-				case value := <-inputCh:
+				case value, ok := <-inputCh:
+					if !ok {
+						close(outputCh)
+						return
+					}
 					outputCh <- value * 10
 				}
 			}
@@ -61,6 +78,7 @@ func TestGolang(t *testing.T) {
 		startTime := time.Now()
 		add := time.Second * 3
 		ctx := context.TODO() // TODO 3초후에 종료하는 timeout context로 만들어주세요.
+		ctx, _ = context.WithTimeout(ctx, add)
 
 		var endTime time.Time
 		select {
@@ -76,7 +94,7 @@ func TestGolang(t *testing.T) {
 		startTime := time.Now()
 		add := time.Second * 3
 		ctx := context.TODO() // TODO 3초후에 종료하는 timeout context로 만들어주세요.
-
+		ctx, _ = context.WithDeadline(ctx, time.Now().Add(add))
 		var endTime time.Time
 		select {
 		case <-ctx.Done():
@@ -88,9 +106,13 @@ func TestGolang(t *testing.T) {
 	})
 
 	t.Run("context value", func(t *testing.T) {
+		ctx := context.TODO()
 		// context에 key, value를 추가해보세요.
+		ctx = context.WithValue(ctx, "key", "value")
 		// 추가된 key, value를 호출하여 assert로 값을 검증해보세요.
+		assert.Equal(t, "value", ctx.Value("key"))
 		// 추가되지 않은 key에 대한 value를 assert로 검증해보세요.
+		assert.Nil(t, ctx.Value("key2"))
 	})
 }
 
